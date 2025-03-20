@@ -1,0 +1,4 @@
+langchain-openai>=0.3.0
+crewai>=0.28.0
+pyyaml>=6.0
+langgraph>=0.0.26
