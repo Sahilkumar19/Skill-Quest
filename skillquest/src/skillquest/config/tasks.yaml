@@ -1,17 +1,194 @@
-research_task:
+categorization:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
-  expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    Strictly analyze if the question relates to Data Science, ML, DL, or AI. 
+    If not, categorize as Irrelevant. Only use other categories for:
+    - Data Science: Statistics, Analytics, Data Modeling
+    - Machine Learning: Algorithms, Training, Predictions
+    - Deep Learning: Neural Networks, Computer Vision, NLP
+    - AI: Reasoning, Problem Solving, Intelligent Systems
 
-reporting_task:
-  description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Common Irrelevant Topics:
+    - General programming (non-ML)
+    - Web/App development
+    - Hardware/Networking
+    - Non-technical subjects
+    - Personal advice
+
+    Question: {question}
+    History: {history}
+
+    Categorization Steps:
+    1. Check if question mentions DS/ML/DL/AI terms
+    2. Verify technical relevance to data workflows
+    3. If uncertain, mark Irrelevant
+    4. Only proceed with categories below if strictly relevant
+
+    Categories:
+    - Irrelevant: Not DS/ML/DL/AI related
+    - Definition-Based: Terminology explanations
+    - Concept-Explanation: Theory/architecture breakdowns
+    - Problem-Solving: Algorithmic solutions
+    - Comparison: Technique/model contrasts
+    - Process-Guide: Data pipeline guidance
+    - Doubt-Clearing: Conceptual misunderstandings
+    - Python-Code: Data science implementations
+    - Python-Debug: ML code troubleshooting
+
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    Single category name from the list above. Must be "Irrelevant" for
+    any non-data-science/ML/AI questions.
+  agent: classifier
+
+definition_based_tasks:
+  description: >
+    For DEFINITION questions about {question}:
+    - Previous context: {history}
+    - Provide formal definition
+    - Give 2 real-world applications
+    - List common misconceptions
+    - Use analogies matching student level
+  expected_output: >
+    Markdown format:
+    # [Term] Definition
+    ## Core Concept
+    - Formal definition
+    ## Real-World Context
+    - Application 1
+    - Application 2
+    ## Common Misunderstandings
+    - Misconception 1 explanation
+  agent: definition_based
+
+concept_explanation_tasks:
+  description: >
+    Explain {question} conceptually:
+    - Build on previous knowledge: {history}
+    - Break into 3-5 key components
+    - Create explanatory analogy
+    - Suggest visualization methods
+    - Connect to fundamental principles
+  expected_output: >
+    Markdown format:
+    # Concept Breakdown
+    ## Key Components
+    1. Component 1
+    2. Component 2
+    ## Learning Analogy
+    - Relatable comparison
+    ## Visualization Tips
+    - Suggested diagrams/charts
+  agent: concept_explanation
+
+problem_solving_tasks:
+  description: >
+    Guide problem solving for {question}:
+    - Reference similar past problems: {history}
+    - Identify problem type
+    - Outline 3-5 step strategy
+    - Provide thinking prompts
+    - Suggest verification methods
+  expected_output: >
+    Markdown format:
+    # Solution Framework
+    ## Problem Type
+    - Classification
+    ## Step-by-Step Approach
+    1. Step 1
+    2. Step 2
+    ## Verification Checklist
+    - Validation method 1
+  agent: problem_solving
+
+comparison_tasks:
+  description: >
+    Compare concepts in {question}:
+    - Consider previous comparisons: {history}
+    - Identify comparison dimensions
+    - Create feature matrix
+    - Highlight key differences
+    - Provide usage scenarios
+  expected_output: >
+    Markdown format:
+    # Comparative Analysis
+    | Feature | Concept A | Concept B |
+    |---------|-----------|-----------|
+    | ...     | ...       | ...       |
+    ## Key Differences
+    - Difference 1
+  agent: comparison
+
+process_guide_tasks:
+  description: >
+    Guide process for {question}:
+    - Reference related processes: {history}
+    - Define success criteria
+    - Outline 5-7 implementation steps
+    - Identify potential pitfalls
+    - Suggest troubleshooting tips
+  expected_output: >
+    Markdown format:
+    # Process Map
+    1. Step 1
+    2. Step 2
+    !!! warning "Common Pitfalls"
+        - Pitfall 1
+  agent: process_guide
+
+doubt_clearing_tasks:
+  description: >
+    Clarify doubts about {question}:
+    - Review previous doubts: {history}
+    - Identify misconception root
+    - Provide counter-examples
+    - Create diagnostic questions
+    - Suggest verification exercises
+  expected_output: >
+    Markdown format:
+    # Doubt Resolution
+    ## Core Misunderstanding
+    - Root cause analysis
+    ## Clarifying Example
+    - Contrastive example
+    ## Self-Check
+    - Diagnostic question
+  agent: doubt_clearing
+
+python_code_tasks:
+  description: >
+    Guide Python implementation for {question}:
+    - Consider previous code discussions: {history}
+    - Suggest architecture pattern
+    - Outline key functions
+    - Recommend testing strategy
+    - Provide pseudo-code sketch
+    - Never write full code
+  expected_output: >
+    Markdown format:
+    # Code Blueprint
+    ```python
+    # Pseudo-code structure
+    def main():
+        # Implementation steps
+    ```
+    ## Testing Approach
+    - Test case 1
+  agent: python_code
+
+python_debug_tasks:
+  description: >
+    Debug Python code for {question}:
+    - Review code history: {history}
+    - Identify error patterns
+    - Suggest debugging tools
+    - Recommend isolation strategy
+    - Provide fix approach
+  expected_output: >
+    Markdown format:
+    # Debugging Guide
+    ## Error Analysis
+    - Root cause
+    ## Diagnostic Steps
+    1. Step 1
+    ## Fix Strategy
+    - Suggested approach
+  agent: python_debug
