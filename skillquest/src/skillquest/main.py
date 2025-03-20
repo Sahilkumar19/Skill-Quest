@@ -202,11 +202,11 @@ def run():
                         'history': format_history(current_session['history']),
                         'current_year': datetime.now().year
                     })
-                    if result.category != "Irrelevant":
+                    if category != "Irrelevant":
                         current_session['history'].append({
                             'question': new_question,
-                            'answer': result.output,
-                            'category': result.category
+                            'answer': result['output'],
+                            'category': category
                         })
                 elif choice == '2':
                     break
