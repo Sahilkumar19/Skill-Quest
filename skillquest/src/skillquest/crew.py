@@ -1,62 +1,220 @@
+from pathlib import Path
+from typing import ClassVar, Any
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
+from langchain_openai import OpenAI
+from .memory import PathwayMemory
+from pydantic import BaseModel, ConfigDict, Field
+import yaml
+from dotenv import load_dotenv
+import os
+import litellm
 
-# If you want to run a snippet of code before or after the crew starts, 
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+class CategoryOutput(BaseModel):
+    category: str
+
+class GuidanceOutput(BaseModel):
+    output: str
+
+
+class PathwayTutorConfig(BaseModel):
+    model_config = ConfigDict(
+        extra="ignore",
+        arbitrary_types_allowed=True
+    )
+    # Define ClassVar fields as class variables but not as model fields
+    base_directory: Path = Field(default_factory=lambda: Path(__file__).parent)
+    
+    # Class variables outside of the Pydantic model field system
+    agents_config: str = "config/agents.yaml"
+    tasks_config: str = "config/tasks.yaml"
 
 @CrewBase
-class Skillquest():
-	"""Skillquest crew"""
+class PathwayTutor:
+    """PathwayTutor AI Crew"""
+    def __init__(self):
+        # super().__init__()
+        self.config = PathwayTutorConfig()  # Instantiate config
+        self._configure_paths()
+        self.memory = PathwayMemory()
 
-	# Learn more about YAML configuration files here:
-	# Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-	# Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-	agents_config = 'config/agents.yaml'
-	tasks_config = 'config/tasks.yaml'
+    def _configure_paths(self):
+        self.agents_config_path = self.config.base_directory / self.config.agents_config
+        self.tasks_config_path = self.config.base_directory / self.config.tasks_config
 
-	# If you would like to add tools to your agents, you can learn more about it here:
-	# https://docs.crewai.com/concepts/agents#agent-tools
-	@agent
-	def researcher(self) -> Agent:
-		return Agent(
-			config=self.agents_config['researcher'],
-			verbose=True
-		)
+    def _create_agent(self, config_name):
+        with open(self.agents_config_path) as f:
+            config = yaml.safe_load(f)
+    
+        return Agent(
+            config=config[config_name],
+            verbose=True,
+            memory=self.memory,  # Inject memory
+            llm=OpenAI(
+                model_name=os.getenv("MODEL"),
+                openai_api_key=os.getenv("GROQ_API_KEY"),
+                base_url="https://api.groq.com/openai/v1"
+            ),
+            allow_delegation=False,
+            max_iter=3
+        )
+    
+    @agent
+    def classifier(self) -> Agent:
+        return self._create_agent('classifier')
 
-	@agent
-	def reporting_analyst(self) -> Agent:
-		return Agent(
-			config=self.agents_config['reporting_analyst'],
-			verbose=True
-		)
+    @agent
+    def definition_based(self) -> Agent:
+        return self._create_agent('definition_based')
 
-	# To learn more about structured task outputs, 
-	# task dependencies, and task callbacks, check out the documentation:
-	# https://docs.crewai.com/concepts/tasks#overview-of-a-task
-	@task
-	def research_task(self) -> Task:
-		return Task(
-			config=self.tasks_config['research_task'],
-		)
+    @agent
+    def concept_explanation(self) -> Agent:
+        return self._create_agent('concept_explanation')
 
-	@task
-	def reporting_task(self) -> Task:
-		return Task(
-			config=self.tasks_config['reporting_task'],
-			output_file='report.md'
-		)
+    @agent
+    def problem_solving(self) -> Agent:
+        return self._create_agent('problem_solving')
 
-	@crew
-	def crew(self) -> Crew:
-		"""Creates the Skillquest crew"""
-		# To learn how to add knowledge sources to your crew, check out the documentation:
-		# https://docs.crewai.com/concepts/knowledge#what-is-knowledge
+    @agent
+    def comparison(self) -> Agent:
+        return self._create_agent('comparison')
 
-		return Crew(
-			agents=self.agents, # Automatically created by the @agent decorator
-			tasks=self.tasks, # Automatically created by the @task decorator
-			process=Process.sequential,
-			verbose=True,
-			# process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
-		)
+    @agent
+    def process_guide(self) -> Agent:
+        return self._create_agent('process_guide')
+
+    @agent
+    def doubt_clearing(self) -> Agent:
+        return self._create_agent('doubt_clearing')
+
+    @agent
+    def python_code(self) -> Agent:
+        return self._create_agent('python_code')
+
+    @agent
+    def python_debug(self) -> Agent:
+        return self._create_agent('python_debug')
+
+    @task
+    def categorize_question(self) -> Task:
+        """Task to classify the question into a category"""
+        return Task(
+            config=self.tasks_config['categorization'],
+            agent=self.classifier(),
+            # output_json=None
+            output_json=CategoryOutput
+        )
+
+    @task
+    def define_term(self) -> Task:
+        """Task to provide a definition and basic explanation of a term"""
+        return Task(
+            config=self.tasks_config['definition_based_tasks'],
+            agent=self.definition_based(),
+            output_json=GuidanceOutput
+
+        )
+
+    @task
+    def explain_concept(self) -> Task:
+        """Task to provide a detailed explanation of a concept"""
+        return Task(
+            config=self.tasks_config['concept_explanation_tasks'],
+            agent=self.concept_explanation(),
+            # output_file="guidance.md"
+            output_json=GuidanceOutput
+
+        )
+
+    @task
+    def solve_problem(self) -> Task:
+        """Task to solve a problem step-by-step"""
+        return Task(
+            config=self.tasks_config['problem_solving_tasks'],
+            agent=self.problem_solving(),
+            output_json=GuidanceOutput
+
+        )
+
+    @task
+    def compare_concepts(self) -> Task:
+        """Task to compare and contrast concepts"""
+        return Task(
+            config=self.tasks_config['comparison_tasks'],
+            agent=self.comparison(),
+            output_json=GuidanceOutput
+
+        )
+
+    @task
+    def guide_process(self) -> Task:
+        """Task to guide through a process"""
+        return Task(
+        config=self.tasks_config['process_guide_tasks'],
+        agent=self.process_guide(),
+        output_json=GuidanceOutput
+
+        )
+
+    @task
+    def clear_doubt(self) -> Task:
+        """Task to clear a doubt"""
+        return Task(
+        config=self.tasks_config['doubt_clearing_tasks'],
+        agent=self.doubt_clearing(),
+        output_json=GuidanceOutput
+
+        )
+
+    @task
+    def provide_python_code(self) -> Task:
+        """Task to provide Python code"""
+        return Task(
+        config=self.tasks_config['python_code_tasks'],
+        agent=self.python_code(),
+        output_json=GuidanceOutput
+
+        )
+
+    @task
+    def debug_python_code(self) -> Task:
+        """Task to debug Python code"""
+        return Task(
+        config=self.tasks_config['python_debug_tasks'],
+        agent=self.python_debug(),
+        output_json=GuidanceOutput
+
+        )
+
+    @crew
+    def crew(self) -> Crew:
+        """Creates the PathwayTutor crew"""
+        return Crew(
+            agents=[
+                self.classifier(),
+                self.definition_based(),
+                self.concept_explanation(),
+                self.problem_solving(),
+                self.comparison(),
+                self.process_guide(),
+                self.doubt_clearing(),
+                self.python_code(),
+                self.python_debug()
+            ],
+            tasks=[
+                self.categorize_question(),
+                self.define_term(),
+                self.explain_concept(),
+                self.solve_problem(),
+                self.compare_concepts(),
+                self.guide_process(),
+                self.clear_doubt(),
+                self.provide_python_code(),
+                self.debug_python_code()
+
+            ],
+            memory=self.memory,
+            process=Process.sequential,
+            verbose=2,
+            full_output=True
+        )
