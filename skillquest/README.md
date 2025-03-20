@@ -1,58 +1,57 @@
-# Skill-Quest
+# Skillquest Crew
 
-Skill-Quest is an AI-powered educational assistant built using **Crew**, designed to provide step-by-step guidance to students instead of direct answers. It helps learners understand concepts by breaking down complex problems into structured steps, fostering a deeper understanding of the subject.
+Welcome to the Skillquest Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
 
-## 🚀 Features
+## Installation
 
-- 🔹 Step-by-step guidance for student queries
-- 🔹 AI-driven hint system to promote critical thinking
-- 🔹 Supports multiple subjects and topics
-- 🔹 GitHub collaboration for continuous improvement
-- 🔹 Dockerized deployment for easy scalability
+Ensure you have Python >=3.10 <3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
 
-## 🛠️ Tech Stack
+First, if you haven't already, install uv:
 
-- **AI Framework:** CrewAI
-- **Backend:** Python, FastAPI
-- **Frontend:** React (optional for UI-based interaction)
-- **Deployment:** Docker, GitHub Actions
+```bash
+pip install uv
+```
 
-## 📦 Installation
+Next, navigate to your project directory and install the dependencies:
 
-1. Clone the repository:
+(Optional) Lock the dependencies and install them by using the CLI command:
 
-   ```bash
-   git clone https://github.com/Sahilkumar19/Skill-Quest.git
-   cd Skill-Quest
-   ```
+```bash
+crewai install
+```
 
-2. Install dependencies:
+### Customizing
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+**Add your `OPENAI_API_KEY` into the `.env` file**
 
-3. Run the application:
-   ```bash
-   python main.py
-   ```
+- Modify `src/skillquest/config/agents.yaml` to define your agents
+- Modify `src/skillquest/config/tasks.yaml` to define your tasks
+- Modify `src/skillquest/crew.py` to add your own logic, tools and specific args
+- Modify `src/skillquest/main.py` to add custom inputs for your agents and tasks
 
-## 🤝 Contributing
+## Running the Project
 
-We welcome contributions! To contribute:
+To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
 
-1. Fork the repository
-2. Create a new branch (`feature-branch`)
-3. Commit your changes
-4. Push to your branch and submit a PR
+```bash
+$ crewai run
+```
 
-## 📜 License
+This command initializes the SkillQuest Crew, assembling the agents and assigning them tasks as defined in your configuration.
 
-This project is licensed under the MIT License. See `LICENSE` for more details.
+This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
 
-## 📧 Contact
+## Understanding Your Crew
 
-For any queries or suggestions, feel free to reach out!
+The SkillQuest Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
 
-- **GitHub Issues**: Submit an issue for bug reports or feature requests
-- **Email**: kumarsahil7753@gmail.com.com
+## Support
+
+For support, questions, or feedback regarding the Skillquest Crew or crewAI.
+
+- Visit our [documentation](https://docs.crewai.com)
+- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
+- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
+- [Chat with our docs](https://chatg.pt/DWjSBZn)
+
+Let's create wonders together with the power and simplicity of crewAI.
