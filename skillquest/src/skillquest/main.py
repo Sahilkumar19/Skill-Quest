@@ -10,7 +10,6 @@ import ast
 # Load environment variables
 load_dotenv()
 
-
 # Configure LiteLLM for Groq
 os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")  # Map Groq key to OpenAI key name
 litellm.drop_params = True
@@ -25,9 +24,35 @@ class SessionManager:
         if session_id not in self.sessions:
             self.sessions[session_id] = {
                 'history': [],
-                'category': None
+                'root_category': None,
+                'root_question': None
             }
         return self.sessions[session_id]
+
+def is_followup_relevant(new_question, session):
+    """Checks if follow-up relates to original context"""
+    if not session['root_question'] or not session['root_category']:
+        return True  # Allow if root not defined (edge case)
+
+    # Simplified check (You can replace this with an actual model call if needed)
+    relevance_prompt = f"""
+    Original Question: {session['root_question']}
+    Original Category: {session['root_category']}
+    Conversation History: {session['history']}
+    
+    New Follow-up Question: {new_question}
+    
+    Does the follow-up relate to the original question and category? (Yes/No)
+    """
+    # For now, we'll simulate (can integrate real classification here)
+    # Example logic: allow if certain keywords match, else reject
+    # You can later replace below with a real API call
+    
+    root_keywords = session['root_question'].lower().split()
+    follow_keywords = new_question.lower().split()
+    overlap = set(root_keywords) & set(follow_keywords)
+    
+    return len(overlap) > 0  # crude keyword overlap check
 
 def display_welcome():
     print("\n" + "🌟" * 40)
@@ -39,12 +64,6 @@ def display_welcome():
 def handle_response(category, result, session):
     """Handles response output and user choices"""
     print("\n" + "=" * 60)
-    
-    # try:
-    #     # Safe attribute access
-    #     category = getattr(category, 'category', 'Unknown')
-    #     output = getattr(result, 'output', 'No guidance generated')
-        
     if category == "Irrelevant":
         print("🚫 This question is outside my expertise in Data Science/AI/ML.")
         print("Please ask about Data Science, ML, or AI concepts.")
@@ -53,10 +72,6 @@ def handle_response(category, result, session):
             
     print(f"🧠 CATEGORY: {category}")
     print(f"📘 GUIDANCE:\n{result}")
-        
-    # except AttributeError as e:
-    #     print(f"⚠️ Error processing response: {str(e)}")
-    
     print("=" * 60)
     return input("\n🤔 Choose: 1. Follow-up 2. New question 3. Exit\nChoice (1-3): ")
 
@@ -70,7 +85,6 @@ def format_history(history):
 
 def run():
     tutor = PathwayTutor()  
-    # conversation_history = []
     sessions = SessionManager()
     current_session = sessions.get_session("default")  # Simplified single session
 
@@ -105,8 +119,10 @@ def run():
             )
             categorization = category_crew.kickoff(inputs=inputs)
             category = str(categorization).strip()
-            current_session['category'] = category
             category_dict = ast.literal_eval(category)
+            category = category_dict['category']
+            current_session['root_category'] = category
+            current_session['root_question'] = question
             
             task_mapping = {
                 "Definition-Based": tutor.define_term(),
@@ -120,7 +136,6 @@ def run():
             }
             result = None  # Initialize result variable
             # Handle irrelevant questions immediately
-            category = category_dict['category']
             if category == "Irrelevant":
                 result = type('obj', (object,), {
                     'category':'Irrelevant',
@@ -128,15 +143,7 @@ def run():
                 })
                 handle_response(category, result, current_session)
                 continue
-            # else:
-            #     current_session['history'].append({
-            #     'question': question,
-            #     'answer': result.output,
-            #     'category': category
-            #     })
             else:
-            # Proceed with relevant tasks
-                # category_dict = ast.literal_eval(category)
                 task = task_mapping.get(category)
                 if not task:
                     print(f"⚠️ Unhandled category: {category}")
@@ -149,65 +156,39 @@ def run():
                     verbose=True
                 )
                 result = execution_crew.kickoff(inputs=inputs)
-                print(result)
-                print(type(result))
+                # print(result)
+                # print(type(result))
                 # Store only relevant history
                 current_session['history'].append({
                     'question': question,
                     'answer': result['output'],
                     'category': category
                 })
-            # task_mapping = {
-            #     "Definition-Based": tutor.define_term(),
-            #     "Concept-Explanation": tutor.explain_concept(),
-            #     "Problem-Solving": tutor.solve_problem(),
-            #     "Comparison": tutor.compare_concepts(),
-            #     "Process-Guide": tutor.guide_process(),
-            #     "Doubt-Clearing": tutor.clear_doubt(),
-            #     "Python-Code": tutor.provide_python_code(),
-            #     "Python-Debug": tutor.debug_python_code()
-            # }
-            # category_dict = ast.literal_eval(category)
-            # # print(category)
-            # task = task_mapping.get(category_dict.get('category'))
-            # # print(task)
-            # if not task:
-            #     print(f"⚠️ Unhandled category: {category}")
-            #     continue
-
-            # execution_crew = Crew(
-            #     agents=[task.agent],
-            #     tasks=[task],
-            #     process=Process.sequential,
-            #     verbose=True
-            # )
-            # result = execution_crew.kickoff(inputs=inputs)
-
-            # # Store only relevant history
-            # if category != "Irrelevant":
-            #     current_session['history'].append({
-            #         'question': question,
-            #         'answer': result.output,
-            #         'category': category
-            #     })
             
             while True:
                 choice = handle_response(category, result['output'], current_session)
                 
                 if choice == '1':
                     new_question = input("\n🔍 Follow-up question: ")
+
+                    # Check follow-up relevance
+                    if not is_followup_relevant(new_question, current_session):
+                        print("\n🚫 This follow-up is off-topic. Please stay within:")
+                        print(f"- Original question: {current_session['root_question']}")
+                        print(f"- Category: {current_session['root_category']}")
+                        continue
+                    # valid followup
                     result = execution_crew.kickoff(inputs={
                         'question': new_question,
                         'model': MODEL_NAME,
                         'history': format_history(current_session['history']),
                         'current_year': datetime.now().year
                     })
-                    if category != "Irrelevant":
-                        current_session['history'].append({
-                            'question': new_question,
-                            'answer': result['output'],
-                            'category': category
-                        })
+                    current_session['history'].append({
+                        'question': new_question,
+                        'answer': result['output'],
+                        'category': category
+                    })
                 elif choice == '2':
                     break
                 elif choice == '3':
@@ -219,7 +200,6 @@ def run():
             print("\n\n🛑 Session interrupted. Type 'exit' to quit.")
         except Exception as e:
             print(f"\n❌ Error: {str(e)}")
-            # conversation_history.append(f"System Error: {str(e)}")
 
 if __name__ == "__main__":
     run()
