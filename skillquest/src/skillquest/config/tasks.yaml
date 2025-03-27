@@ -1,18 +1,21 @@
 categorization:
-  description: >
-    Strictly analyze if the question relates to Data Science, ML, DL, or AI. 
+  description: |
+    Strictly analyze if the question relates to Data Science, ML, DL, AI or Python Programming. 
     If not, categorize as Irrelevant. Only use other categories for:
     - Data Science: Statistics, Analytics, Data Modeling
     - Machine Learning: Algorithms, Training, Predictions
     - Deep Learning: Neural Networks, Computer Vision, NLP
     - AI: Reasoning, Problem Solving, Intelligent Systems
+    - Python Programming: Libraries, Syntax, code debugging, etc.
 
     Common Irrelevant Topics:
-    - General programming (non-ML)
+    - General programming (non-python)
     - Web/App development
     - Hardware/Networking
     - Non-technical subjects
     - Personal advice
+    - Career guidance
+    - General knowledge queries
 
     Question: {question}
     History: {history}
@@ -34,40 +37,38 @@ categorization:
     - Python-Code: Data science implementations
     - Python-Debug: ML code troubleshooting
 
-  expected_output: >
+  expected_output: |
     Single category name from the list above. Must be "Irrelevant" for
-    any non-data-science/ML/AI questions.
+    any non-data-science/ML/AI/Python-Programming questions.
   agent: classifier
 
 definition_based_tasks:
-  description: >
+  description: |
     For DEFINITION questions about {question}:
     - Previous context: {history}
-    - Provide formal definition
-    - Give 2 real-world applications
-    - List common misconceptions
-    - Use analogies matching student level
-  expected_output: >
+    - Provide crisp formal definition which should be easy to understand and not too technical 
+    - Make the term understandable to a beginner by using simple language and giving relatable examples of Application
+    - List a few common misconceptions if any about the term
+  expected_output: |
     Markdown format:
     # [Term] Definition
     ## Core Concept
     - Formal definition
     ## Real-World Context
     - Application 1
-    - Application 2
     ## Common Misunderstandings
     - Misconception 1 explanation
   agent: definition_based
 
 concept_explanation_tasks:
-  description: >
+  description: |
     Explain {question} conceptually:
     - Build on previous knowledge: {history}
     - Break into 3-5 key components
     - Create explanatory analogy
     - Suggest visualization methods
     - Connect to fundamental principles
-  expected_output: >
+  expected_output: |
     Markdown format:
     # Concept Breakdown
     ## Key Components
@@ -80,14 +81,14 @@ concept_explanation_tasks:
   agent: concept_explanation
 
 problem_solving_tasks:
-  description: >
+  description: |
     Guide problem solving for {question}:
     - Reference similar past problems: {history}
     - Identify problem type
     - Outline 3-5 step strategy
     - Provide thinking prompts
     - Suggest verification methods
-  expected_output: >
+  expected_output: |
     Markdown format:
     # Solution Framework
     ## Problem Type
@@ -100,14 +101,14 @@ problem_solving_tasks:
   agent: problem_solving
 
 comparison_tasks:
-  description: >
+  description: |
     Compare concepts in {question}:
     - Consider previous comparisons: {history}
     - Identify comparison dimensions
     - Create feature matrix
     - Highlight key differences
     - Provide usage scenarios
-  expected_output: >
+  expected_output: |
     Markdown format:
     # Comparative Analysis
     | Feature | Concept A | Concept B |
@@ -118,14 +119,14 @@ comparison_tasks:
   agent: comparison
 
 process_guide_tasks:
-  description: >
+  description: |
     Guide process for {question}:
     - Reference related processes: {history}
     - Define success criteria
     - Outline 5-7 implementation steps
     - Identify potential pitfalls
     - Suggest troubleshooting tips
-  expected_output: >
+  expected_output: |
     Markdown format:
     # Process Map
     1. Step 1
@@ -135,14 +136,14 @@ process_guide_tasks:
   agent: process_guide
 
 doubt_clearing_tasks:
-  description: >
+  description: |
     Clarify doubts about {question}:
     - Review previous doubts: {history}
     - Identify misconception root
     - Provide counter-examples
     - Create diagnostic questions
     - Suggest verification exercises
-  expected_output: >
+  expected_output: |
     Markdown format:
     # Doubt Resolution
     ## Core Misunderstanding
@@ -154,35 +155,33 @@ doubt_clearing_tasks:
   agent: doubt_clearing
 
 python_code_tasks:
-  description: >
+  description: |
     Guide Python implementation for {question}:
     - Consider previous code discussions: {history}
-    - Suggest architecture pattern
-    - Outline key functions
-    - Recommend testing strategy
-    - Provide pseudo-code sketch
     - Never write full code
-  expected_output: >
+    - just explain the logic and give some examples of input and output
+    - Outline key functions but do not implement actual function
+    - Provide pseudo-code sketch
+
+  expected_output: |
     Markdown format:
     # Code Blueprint
     ```python
     # Pseudo-code structure
-    def main():
-        # Implementation steps
     ```
     ## Testing Approach
     - Test case 1
   agent: python_code
 
 python_debug_tasks:
-  description: >
+  description: |
     Debug Python code for {question}:
     - Review code history: {history}
     - Identify error patterns
     - Suggest debugging tools
     - Recommend isolation strategy
     - Provide fix approach
-  expected_output: >
+  expected_output: |
     Markdown format:
     # Debugging Guide
     ## Error Analysis
