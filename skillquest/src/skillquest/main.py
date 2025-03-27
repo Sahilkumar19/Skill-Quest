@@ -44,10 +44,6 @@ def is_followup_relevant(new_question, session):
     
     Does the follow-up relate to the original question and category? (Yes/No)
     """
-    # For now, we'll simulate (can integrate real classification here)
-    # Example logic: allow if certain keywords match, else reject
-    # You can later replace below with a real API call
-    
     root_keywords = session['root_question'].lower().split()
     follow_keywords = new_question.lower().split()
     overlap = set(root_keywords) & set(follow_keywords)
