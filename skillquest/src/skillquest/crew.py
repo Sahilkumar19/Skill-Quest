@@ -3,7 +3,7 @@ from typing import ClassVar, Any
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from langchain_openai import OpenAI
-from .memory import PathwayMemory
+from memory import PathwayMemory
 from pydantic import BaseModel, ConfigDict, Field
 import yaml
 from dotenv import load_dotenv
