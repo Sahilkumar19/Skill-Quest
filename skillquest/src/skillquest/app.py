@@ -8,6 +8,7 @@ from crewai import Crew, Process
 import ast
 import streamlit as st
 
+# Load environment variables
 load_dotenv()
 
 # Configure LiteLLM for Groq
@@ -15,10 +16,12 @@ os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 litellm.drop_params = True
 MODEL_NAME = os.getenv("MODEL")
 
+
+# ---------- Session Management ----------
 class SessionManager:
     def __init__(self):
         self.sessions = {}
-        
+
     def get_session(self, session_id):
         if session_id not in self.sessions:
             self.sessions[session_id] = {
@@ -28,12 +31,14 @@ class SessionManager:
             }
         return self.sessions[session_id]
 
+
 def format_history(history):
     return "\n".join([
-        f"Q: {item['question']}\nA: {item['answer']}" 
-        for item in history 
+        f"Q: {item['question']}\nA: {item['answer']}"
+        for item in history
         if item['category'] != "Irrelevant"
     ][-3:])
+
 
 def is_followup_relevant(new_question, session):
     """Checks if follow-up relates to original context"""
@@ -43,8 +48,9 @@ def is_followup_relevant(new_question, session):
     root_keywords = session['root_question'].lower().split()
     follow_keywords = new_question.lower().split()
     overlap = set(root_keywords) & set(follow_keywords)
-    
+
     return len(overlap) > 0  # crude keyword overlap check
+
 
 def initialize_session_state():
     if 'session_manager' not in st.session_state:
@@ -53,10 +59,13 @@ def initialize_session_state():
         st.session_state.current_session = st.session_state.session_manager.get_session("default")
     if 'tutor' not in st.session_state:
         st.session_state.tutor = PathwayTutor()
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
 
+
+# ---------- Processing Logic ----------
 def process_question(user_question):
     """Process a question and return the result"""
-    # Prepare inputs
     inputs = {
         'question': user_question,
         'current_year': str(datetime.now().year),
@@ -76,15 +85,15 @@ def process_question(user_question):
     category_dict = ast.literal_eval(str(categorization).strip())
     category = category_dict['category']
 
-    # Update session
+    # Update session context
     st.session_state.current_session['root_category'] = category
     st.session_state.current_session['root_question'] = user_question
 
-    # Handle response
+    # Handle irrelevant category
     if category == "Irrelevant":
         return "This question is outside my expertise in Data Science/AI/ML. Please ask about Data Science, ML, or AI concepts.", category
 
-    # Get appropriate task
+    # Map category to appropriate task
     task_mapping = {
         "Definition-Based": st.session_state.tutor.define_term(),
         "Concept-Explanation": st.session_state.tutor.explain_concept(),
@@ -102,13 +111,16 @@ def process_question(user_question):
             agents=[task.agent],
             tasks=[task],
             process=Process.sequential,
-            verbose=True
+            verbose=True,
+            full_output=True
         )
         result = execution_crew.kickoff(inputs=inputs)
         return result['output'], category
 
     return "Unable to process the question.", category
 
+
+# ---------- Streamlit UI ----------
 def main():
     st.set_page_config(
         page_title="Skill Quest - AI Learning Companion",
@@ -118,83 +130,62 @@ def main():
 
     initialize_session_state()
 
-    # Header
+    # Title and Sidebar
     st.title("🎓 Skill Quest - Your AI Learning Companion")
     st.markdown("---")
 
-    # Sidebar
     with st.sidebar:
         st.header("About")
         st.write("I specialize in Data Science, Machine Learning, and AI concepts.")
-        
-        if st.button("Start New Session"):
+        if st.button("🆕 Start New Session"):
             st.session_state.current_session = st.session_state.session_manager.get_session(
                 str(datetime.now())
             )
+            st.session_state.chat_history = []
             st.success("New session started!")
 
-    # Main chat interface
-    st.subheader("Ask Your Question")
-    user_question = st.text_input("💭 Enter your Data Science/AI question:", key="question_input")
+    # Chat History Display
+    for message in st.session_state.chat_history:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-    if st.button("Submit Question"):
-        if user_question:
-            with st.spinner("Processing your question..."):
+    # User Input
+    user_input = st.chat_input("Ask me about Data Science, ML, or AI...")
+
+    if user_input:
+        st.session_state.chat_history.append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
                 try:
-                    # Process the question
-                    answer, category = process_question(user_question)
+                    answer, category = process_question(user_input)
 
-                    # Display final answer
-                    st.markdown("---")
-                    st.markdown("### 📌 Final Answer")
-                    st.markdown(answer)
+                    # st.markdown(answer)
+                    st.markdown(answer, unsafe_allow_html=True)
 
-                    # Store in history
+
+                    st.session_state.chat_history.append({
+                        "role": "assistant",
+                        "content": answer
+                    })
+
                     if category != "Irrelevant":
                         st.session_state.current_session['history'].append({
-                            'question': user_question,
+                            'question': user_input,
                             'answer': answer,
                             'category': category
                         })
 
                 except Exception as e:
-                    st.error(f"An error occurred: {str(e)}")
-                    st.code(str(e), language='python')
+                    error_msg = f"An error occurred: {str(e)}"
+                    st.error(error_msg)
+                    st.session_state.chat_history.append({
+                        "role": "assistant",
+                        "content": error_msg
+                    })
 
-    # Follow-up question handling
-    if st.session_state.current_session['history']:
-        st.markdown("---")
-        st.subheader("Follow-up Question")
-        followup_question = st.text_input("🔄 Enter a follow-up question:", key="followup_input")
-        if st.button("Submit Follow-up"):
-            if followup_question:
-                if not is_followup_relevant(followup_question, st.session_state.current_session):
-                    st.error("This follow-up is off-topic. Please stay within the context of the original question.")
-                else:
-                    # Process follow-up question
-                    with st.spinner("Processing your follow-up question..."):
-                        try:
-                            followup_answer, followup_category = process_question(followup_question)
-                            if followup_category != "Irrelevant":
-                                st.session_state.current_session['history'].append({
-                                    'question': followup_question,
-                                    'answer': followup_answer,
-                                    'category': followup_category
-                                })
-                            st.write("### 📌 Follow-up Answer")
-                            st.markdown(followup_answer)
-                        except Exception as e:
-                            st.error(f"An error occurred: {str(e)}")
-                            st.code(str(e), language='python')
-
-    # Display conversation history
-    if st.session_state.current_session['history']:
-        st.markdown("---")
-        st.subheader("Conversation History")
-        for item in st.session_state.current_session['history']:
-            with st.expander(f"Q: {item['question']}", expanded=False):
-                st.write(f"Category: {item['category']}")
-                st.write(f"A: {item['answer']}")
 
 if __name__ == "__main__":
     main()
