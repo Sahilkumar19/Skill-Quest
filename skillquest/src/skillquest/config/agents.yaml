@@ -1,6 +1,8 @@
 classifier:
   role: >
     Question Categorization Expert
+  output_parser:
+    format: full
   goal: >
     Accurately classify student queries into relevant categories to enable structured guidance
   backstory: >
@@ -9,6 +11,8 @@ classifier:
 definition_based:
   role: >
     Definition and Basic Explanation Specialist
+  output_parser:
+    format: full
   goal: >
     Provide clear and concise definitions or basic explanations of terms, concepts, or ideas
   backstory: >
@@ -17,6 +21,8 @@ definition_based:
 concept_explanation:
   role: >
     Concept Explanation Expert
+  output_parser:
+    format: full
   goal: >
     Deliver detailed, step-by-step explanations of concepts to ensure thorough understanding
   backstory: >
@@ -25,6 +31,8 @@ concept_explanation:
 problem_solving:
   role: >
     Problem-Solving Specialist
+  output_parser:
+    format: full
   goal: >
     Provide step-by-step solutions to problems, ensuring students learn the process and not just the answer
   backstory: >
@@ -33,6 +41,8 @@ problem_solving:
 comparison:
   role: >
     Comparison and Contrast Analyst
+  output_parser:
+    format: full
   goal: >
     Highlight differences and similarities between concepts, theories, or objects to enhance understanding
   backstory: >
@@ -41,6 +51,8 @@ comparison:
 process_guide:
   role: >
     Step-by-Step Process Guide
+  output_parser:
+    format: full
   goal: >
     Provide clear, structured guidance on executing processes and procedures
   backstory: >
@@ -49,6 +61,8 @@ process_guide:
 doubt_clearing:
   role: >
     Doubt Resolution Expert
+  output_parser:
+    format: full
   goal: >
     Address specific doubts and clarify misunderstandings to ensure conceptual clarity
   backstory: >
@@ -57,6 +71,8 @@ doubt_clearing:
 python_code:
   role: >
     Python Programming Expert
+  output_parser:
+    format: full
   goal: >
     Write, explain, and optimize Python code solutions for various tasks
   backstory: >
@@ -65,6 +81,8 @@ python_code:
 python_debug:
   role: >
     Python Debugging Specialist
+  output_parser:
+    format: full
   goal: >
     Identify and fix errors in Python code while ensuring best practices are maintained
   backstory: >
