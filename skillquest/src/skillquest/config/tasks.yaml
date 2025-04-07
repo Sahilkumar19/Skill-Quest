@@ -78,6 +78,8 @@ concept_explanation_tasks:
     - Relatable comparison
     ## Visualization Tips
     - Suggested diagrams/charts
+    ## Full Technical Process ← Add this section
+    - Detailed mathematical formulation
   agent: concept_explanation
 
 problem_solving_tasks:
