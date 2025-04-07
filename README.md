@@ -13,8 +13,8 @@ Skill-Quest is an AI-powered educational assistant built using **Crew**, designe
 ## 🛠️ Tech Stack
 
 - **AI Framework:** CrewAI
-- **Backend:** Python, FastAPI
-- **Frontend:** React (optional for UI-based interaction)
+- **Backend:** Python
+- **Frontend:** Streamlit (for UI-based interaction)
 - **Deployment:** Docker, GitHub Actions
 
 ## 📦 Installation
@@ -34,7 +34,7 @@ Skill-Quest is an AI-powered educational assistant built using **Crew**, designe
 
 3. Run the application:
    ```bash
-   python main.py
+   python app.py
    ```
 
 ## 🤝 Contributing
