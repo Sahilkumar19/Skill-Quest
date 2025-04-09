@@ -53,10 +53,12 @@ class PathwayTutor:
             llm=OpenAI(
                 model_name=os.getenv("MODEL"),
                 openai_api_key=os.getenv("GROQ_API_KEY"),
-                base_url="https://api.groq.com/openai/v1"
+                base_url="https://api.groq.com/openai/v1",
+                temperature=0.3,
+                max_tokens=2048,
             ),
             allow_delegation=False,
-            max_iter=3
+            max_iter=5
         )
     
     @agent
