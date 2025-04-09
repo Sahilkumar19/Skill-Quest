@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
-from .crew import PathwayTutor
+from crew import PathwayTutor
 from dotenv import load_dotenv
 import os
 import litellm
@@ -113,6 +113,8 @@ def run():
                 process=Process.sequential,
                 verbose=True
             )
+            # print("this is categorized task",categorize_task)
+            # print("this is output",categorize_task.output)
             categorization = category_crew.kickoff(inputs=inputs)
             category = str(categorization).strip()
             category_dict = ast.literal_eval(category)
@@ -152,8 +154,10 @@ def run():
                     verbose=True
                 )
                 result = execution_crew.kickoff(inputs=inputs)
-                # print(result)
-                # print(type(result))
+                # print("this is result",result)
+                # print("this is raw output",result.raw)
+                # print("this is summary output",result.summary)
+                # print("this is description output",result.description)
                 # Store only relevant history
                 current_session['history'].append({
                     'question': question,
