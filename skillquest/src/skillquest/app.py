@@ -115,7 +115,7 @@ def process_question(user_question):
             full_output=True
         )
         result = execution_crew.kickoff(inputs=inputs)
-        return result['output'], category
+        return result.raw, category
 
     return "Unable to process the question.", category
 
