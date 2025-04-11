@@ -1,9 +1,25 @@
-# langchain-openai>=0.3.0
+# # langchain-openai>=0.3.0
+# langchain==0.3.2
+# langchain-openai==0.1.8
+# # crewai>=0.28.0
+# crewai==0.28.8
+# pyyaml>=6.0
+# langgraph>=0.0.26
+# chromadb==0.5.10
+# streamlit
+
+# Core app dependencies
+streamlit==1.32.2
+python-dotenv==1.0.1
+litellm==1.38.3
+crewai==0.28.8
+
+# Compatible LLM tooling
 langchain==0.3.2
 langchain-openai==0.1.8
-# crewai>=0.28.0
-crewai==0.28.8
-pyyaml>=6.0
-langgraph>=0.0.26
+
+# Required by CrewAI (indirectly depends on embedchain)
 chromadb==0.5.10
-streamlit
+
+# Optional - For your app's structure
+astor
