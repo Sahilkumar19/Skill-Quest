@@ -8,18 +8,12 @@
 # chromadb==0.5.10
 # streamlit
 
-# Core app dependencies
 streamlit==1.32.2
-python-dotenv==1.0.1
+python-dotenv==1.0.0
 litellm==1.38.3
 crewai==0.28.8
-
-# Compatible LLM tooling
-langchain==0.3.2
-langchain-openai==0.1.8
-
-# Required by CrewAI (indirectly depends on embedchain)
+langchain==0.2.1
+langchain-openai==0.1.6
 chromadb==0.5.10
-
-# Optional - For your app's structure
 astor
+
