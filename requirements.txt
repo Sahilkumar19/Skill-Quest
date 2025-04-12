@@ -1,19 +1,15 @@
-# # langchain-openai>=0.3.0
-# langchain==0.3.2
-# langchain-openai==0.1.8
-# # crewai>=0.28.0
-# crewai==0.28.8
+crewai
+langchain
+langchain-core
+langchain-openai
+pyyaml>=6.0
+langgraph>=0.0.26
+chromadb==0.5.10
+streamlit==1.44.1
+
+# langchain-openai>=0.3.0
+# crewai>=0.28.0
 # pyyaml>=6.0
 # langgraph>=0.0.26
 # chromadb==0.5.10
 # streamlit
-
-streamlit==1.32.2
-python-dotenv==1.0.0
-litellm==1.38.3
-crewai==0.28.8
-langchain==0.2.1
-langchain-openai==0.1.6
-chromadb==0.5.10
-astor
-
