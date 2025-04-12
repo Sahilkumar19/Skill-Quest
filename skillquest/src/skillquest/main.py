@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
-from .crew import PathwayTutor
+from crew import PathwayTutor
 from dotenv import load_dotenv
 import os
 import litellm
