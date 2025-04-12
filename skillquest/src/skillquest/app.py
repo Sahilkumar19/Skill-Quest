@@ -1,7 +1,7 @@
 import sys
 import os
 from datetime import datetime
-from crew import PathwayTutor
+from .crew import PathwayTutor
 from dotenv import load_dotenv
 import litellm
 from crewai import Crew, Process
