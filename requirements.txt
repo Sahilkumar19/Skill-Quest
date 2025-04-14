@@ -1,5 +1,6 @@
 crewai
 chromadb>=0.4.22
+pysqlite3-binary
 langchain
 langchain-core
 langchain-openai
