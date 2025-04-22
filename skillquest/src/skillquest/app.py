@@ -101,6 +101,7 @@ def process_question(user_question):
     task_mapping = {
         "Definition-Based": st.session_state.tutor.define_term(),
         "Concept-Explanation": st.session_state.tutor.explain_concept(),
+        "Types-Examples": st.session_state.tutor.give_types_examples(),
         "Problem-Solving": st.session_state.tutor.solve_problem(),
         "Comparison": st.session_state.tutor.compare_concepts(),
         "Process-Guide": st.session_state.tutor.guide_process(),
