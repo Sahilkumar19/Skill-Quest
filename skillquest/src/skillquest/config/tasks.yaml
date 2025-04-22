@@ -30,6 +30,7 @@ categorization:
     - Irrelevant: Not DS/ML/DL/AI related
     - Definition-Based: Terminology explanations
     - Concept-Explanation: Theory/architecture breakdowns
+    - Types-Examples: Types and examples
     - Problem-Solving: Algorithmic solutions
     - Comparison: Technique/model contrasts
     - Process-Guide: Data pipeline guidance
@@ -81,6 +82,26 @@ concept_explanation_tasks:
     ## Full Technical Process ← Add this section
     - Detailed mathematical formulation
   agent: concept_explanation
+
+types_examples_tasks:
+  description: |
+    Handle questions asking for types or examples related to {question}:
+    - Reference previous related questions: {history}
+    - Clearly identify if the user is asking for types, categories, or examples
+    - Provide a categorized list of types (if applicable)
+    - Give relevant and practical examples for each type or category
+    - Use simple and structured formatting for readability
+  expected_output: |
+    Markdown format:
+    # Types and Examples
+    ## Types/Categories
+    - Type 1: Brief explanation
+    - Type 2: Brief explanation
+    ## Examples
+    - Example 1
+    - Example 2
+    - Example 3
+  agent: types_examples
 
 problem_solving_tasks:
   description: |
