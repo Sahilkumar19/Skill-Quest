@@ -74,6 +74,10 @@ class PathwayTutor:
         return self._create_agent('concept_explanation')
 
     @agent
+    def types_examples(self) -> Agent:
+        return self._create_agent('types_examples')
+    
+    @agent
     def problem_solving(self) -> Agent:
         return self._create_agent('problem_solving')
 
@@ -124,6 +128,16 @@ class PathwayTutor:
             config=self.tasks_config['concept_explanation_tasks'],
             agent=self.concept_explanation(),
             # output_file="guidance.md"
+            output_json=GuidanceOutput
+
+        )
+    
+    @task
+    def give_types_examples(self) -> Task:
+        """Task to provide types and examples of a concept"""
+        return Task(
+            config=self.tasks_config['types_examples_tasks'],
+            agent=self.types_examples(),
             output_json=GuidanceOutput
 
         )
@@ -196,6 +210,7 @@ class PathwayTutor:
                 self.classifier(),
                 self.definition_based(),
                 self.concept_explanation(),
+                self.types_examples(),
                 self.problem_solving(),
                 self.comparison(),
                 self.process_guide(),
@@ -207,6 +222,7 @@ class PathwayTutor:
                 self.categorize_question(),
                 self.define_term(),
                 self.explain_concept(),
+                self.give_types_examples(),
                 self.solve_problem(),
                 self.compare_concepts(),
                 self.guide_process(),
