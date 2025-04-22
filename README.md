@@ -34,7 +34,7 @@ Skill-Quest is an AI-powered educational assistant built using **Crew**, designe
 
 3. Run the application:
    ```bash
-   python app.py
+   streamlit run app.py
    ```
 
 ## 🤝 Contributing
