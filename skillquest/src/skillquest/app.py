@@ -1,7 +1,7 @@
 # Patch for pysqlite3 to act as sqlite3
-# __import__('pysqlite3')
-# import sys
-# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # Import necessary modules
 import sys
