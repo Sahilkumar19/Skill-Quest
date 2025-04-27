@@ -7,10 +7,3 @@ langchain-openai
 pyyaml>=6.0
 langgraph>=0.0.26
 streamlit==1.44.1
-
-# langchain-openai>=0.3.0
-# crewai>=0.28.0
-# pyyaml>=6.0
-# langgraph>=0.0.26
-# chromadb==0.5.10
-# streamlit
