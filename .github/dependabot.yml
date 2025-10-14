@@ -5,14 +5,9 @@
 
 version: 2
 updates:
-  - package-ecosystem: "pip"
-    directory: "/"
+  - package-ecosystem: "pip"          # Use pip for Python dependencies
+    directory: "/"                    # Location of your requirements.txt
     schedule:
-      interval: "weekly"
+      interval: "weekly"              # Check for updates once a week
     allow:
-      - dependency-type: "all"
-
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
+      - dependency-type: "all"        # Update both direct and indirect dependencies
