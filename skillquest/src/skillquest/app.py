@@ -1,7 +1,4 @@
-# Patch for pysqlite3 to act as sqlite3
-__import__('pysqlite3')
 import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # Import necessary modules
 import sys
@@ -23,7 +20,7 @@ os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 # Configure LiteLLM to drop unnecessary parameters
 litellm.drop_params = True
 # Fetch the model name from environment variables
-MODEL_NAME = os.getenv("MODEL")
+MODEL_NAME = os.getenv("MODEL") #LLama 3.3 70B
 
 
 # ---------- Session Management ----------

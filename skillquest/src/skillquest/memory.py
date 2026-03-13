@@ -1,10 +1,22 @@
 # Import necessary classes and types
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain_core.memory import BaseMemory
 from pydantic import BaseModel, Field
 from typing import List, Any, Dict
+from abc import abstractmethod
 
-class PathwayMemory(BaseMemory, BaseModel):
+# BaseMemory was removed from langchain_core in newer versions — define minimal interface
+class BaseMemory:
+    @property
+    @abstractmethod
+    def memory_variables(self) -> List[str]: ...
+    @abstractmethod
+    def load_memory_variables(self, inputs: Dict[str, Any]) -> Dict[str, Any]: ...
+    @abstractmethod
+    def save_context(self, inputs: Any, outputs: Any) -> None: ...
+    @abstractmethod
+    def clear(self) -> None: ...
+
+class PathwayMemory(BaseModel, BaseMemory):
     """Custom memory implementation compatible with modern LangChain patterns."""
 
     # A list to store conversation history (alternating human and AI messages)
