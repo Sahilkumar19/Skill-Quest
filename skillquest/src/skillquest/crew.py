@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import ClassVar, Any
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from langchain_openai import OpenAI
+from crewai import LLM
 from memory import PathwayMemory
 from pydantic import BaseModel, ConfigDict, Field
 import yaml
@@ -59,10 +59,9 @@ class PathwayTutor:
             config=config[config_name],
             verbose=True,
             memory=self.memory,  # Attach memory module
-            llm=OpenAI(  # Use OpenAI-compatible model with GROQ API
-                model_name=os.getenv("MODEL"),
-                openai_api_key=os.getenv("GROQ_API_KEY"),
-                base_url="https://api.groq.com/openai/v1",
+            llm=LLM(  # Use CrewAI's native LLM routed via LiteLLM to Groq
+                model=f"groq/{os.getenv('MODEL')}",
+                api_key=os.getenv("GROQ_API_KEY"),
                 temperature=0.3,
                 max_tokens=2048,
             ),
