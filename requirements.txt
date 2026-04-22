@@ -4,6 +4,6 @@ pysqlite3-binary
 langchain
 langchain-core
 langchain-openai
-pyyaml>=6.0
+pyyaml>=6.0.3
 langgraph>=0.0.26
 streamlit==1.56.0
