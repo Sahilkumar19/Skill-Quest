@@ -6,4 +6,4 @@ langchain-core
 langchain-openai
 pyyaml>=6.0.3
 langgraph>=1.2.7
-streamlit==1.58.0
+streamlit==1.59.0
